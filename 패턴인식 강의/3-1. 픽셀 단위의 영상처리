@@ -1,0 +1,119 @@
+# 영상처리와 패턴인식
+## 영상의 밝기 변화
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <Windows.h>
+
+void  main() {
+
+	BITMAPFILEHEADER hf; // BMP 파일헤더 14Bytes
+	BITMAPINFOHEADER hInfo; // BMP 인포에더 40Bytes
+	RGBQUAD hRGB[256]; // 팔레트 (256*4 Bytes)
+	
+	FILE *fp;
+	fp = fopen("lenna.bmp", "rb");
+	if (fp==NULL)
+	{
+		return;
+	}
+	fread(&hf, sizeof(BITMAPFILEHEADER), 1, fp);
+	fread(&hInfo, sizeof(BITMAPINFOHEADER), 1, fp);
+	fread(hRGB, sizeof(RGBQUAD), 256, fp);
+	
+	int ImgSize = hInfo.biWidth * hInfo.biHeight;
+
+	BYTE * Image = (BYTE *)malloc(ImgSize);
+	BYTE * Output = (BYTE *)malloc(ImgSize);
+
+	fread(Image, sizeof(BYTE), ImgSize, fp);
+	fclose(fp);
+
+	// 밝기 변화
+	int val;
+	printf("값을 입력: ");
+	scanf("%d", &val);
+
+	for (int i = 0; i < ImgSize; i++)
+	{
+		if ((Image[i] + val) > 255)
+		{
+			Output[i] = 255;
+		}
+		else if ((Image[i] + val) < 0)
+		{
+			Output[i] = 0;
+		}
+		else
+		{
+			Output[i] = Image[i] + val;
+		}
+	}
+
+	fp = fopen("output.bmp", "wb");
+	fwrite(&hf, sizeof(BYTE), sizeof(BITMAPFILEHEADER), fp);
+	fwrite(&hInfo, sizeof(BYTE), sizeof(BITMAPINFOHEADER), fp);
+	fwrite(hRGB, sizeof(RGBQUAD), 256, fp);
+	fwrite(Output, sizeof(BYTE), ImgSize, fp);
+	fclose(fp);
+	free(Image);
+	free(Output);
+}
+```
+## 영상의 대비 변화
+```C++
+#include <stdio.h>
+#include <stdlib.h>
+#include <Windows.h>
+
+void  main() {
+
+	BITMAPFILEHEADER hf; // BMP 파일헤더 14Bytes
+	BITMAPINFOHEADER hInfo; // BMP 인포에더 40Bytes
+	RGBQUAD hRGB[256]; // 팔레트 (256*4 Bytes)
+	
+	FILE *fp;
+	fp = fopen("lenna.bmp", "rb");
+	if (fp==NULL)
+	{
+		return;
+	}
+	fread(&hf, sizeof(BITMAPFILEHEADER), 1, fp);
+	fread(&hInfo, sizeof(BITMAPINFOHEADER), 1, fp);
+	fread(hRGB, sizeof(RGBQUAD), 256, fp);
+	
+	int ImgSize = hInfo.biWidth * hInfo.biHeight;
+
+	BYTE * Image = (BYTE *)malloc(ImgSize);
+	BYTE * Output = (BYTE *)malloc(ImgSize);
+
+	fread(Image, sizeof(BYTE), ImgSize, fp);
+	fclose(fp);
+
+	// 대비 변화
+	double val;
+	printf("실수 값 입력: ");
+	scanf("%lf", &val);
+
+	for (int i = 0; i < ImgSize; i++)
+	{
+		if ((Image[i] * val) > 255.0)
+		{
+			Output[i] = 255;
+		}
+		else
+		{
+			Output[i] = (BYTE)(Image[i] * val);
+		}
+	}
+
+	fp = fopen("output.bmp", "wb");
+	fwrite(&hf, sizeof(BYTE), sizeof(BITMAPFILEHEADER), fp);
+	fwrite(&hInfo, sizeof(BYTE), sizeof(BITMAPINFOHEADER), fp);
+	fwrite(hRGB, sizeof(RGBQUAD), 256, fp);
+	fwrite(Output, sizeof(BYTE), ImgSize, fp);
+	fclose(fp);
+	free(Image);
+	free(Output);
+}
+```
